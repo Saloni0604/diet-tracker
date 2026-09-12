@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Saloni's Diet Tracker</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f7f4;color:#1a1a18;-webkit-font-smoothing:antialiased;font-size:15px}
+/* HEADER */
+.hdr{background:#2d6a4f;padding:20px 16px 18px;text-align:center}
+.hdr-sub{font-size:11px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px}
+.hdr-title{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}
+.hdr-quote{font-size:12px;color:rgba(255,255,255,0.8);font-style:italic;line-height:1.6;margin-bottom:12px;padding:0 8px}
+.hdr-week{display:inline-block;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;color:#fff}
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:2px solid #e0dfd8;position:sticky;top:0;z-index:99}
+.tab-btn{flex:1;padding:13px 0;font-size:13px;font-weight:700;text-align:center;cursor:pointer;color:#999;border:none;background:#fff;border-bottom:3px solid transparent;margin-bottom:-2px;-webkit-tap-highlight-color:transparent;transition:color 0.15s}
+.tab-btn.on{color:#2d6a4f;border-bottom:3px solid #2d6a4f}
+/* PANELS */
+.panel{padding:12px;display:none}
+.panel.on{display:block}
+/* TOP NAV */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nbtn{background:#fff;border:1.5px solid #ccc;border-radius:10px;width:44px;height:44px;font-size:20px;color:#333;cursor:pointer;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center}
+.daytitle{font-size:15px;font-weight:700;color:#1a1a18;text-align:center}
+.datesub{font-size:12px;color:#888;text-align:center;margin-top:2px}
+/* PROGRESS */
+.progrow{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.progtrack{flex:1;height:6px;background:#d4e6dd;border-radius:3px}
+.progfill{height:100%;background:#2d6a4f;border-radius:3px;transition:width 0.3s}
+.proglbl{font-size:12px;color:#2d6a4f;font-weight:700;white-space:nowrap}
+/* MEAL CARDS */
+.mcard{background:#fff;border:1.5px solid #d8e8e0;border-radius:14px;margin-bottom:10px;overflow:hidden}
+.mcard.done-card{border-color:#2d6a4f}
+.mcard.skip-card{border-color:#c0392b}
+.mhead{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f8fdf9;border-bottom:1px solid #eaf3ed}
+.tbadge{font-size:10px;color:#2d6a4f;background:#e8f5ee;border:1px solid #b7dfc8;border-radius:6px;padding:3px 7px;min-width:56px;text-align:center;white-space:nowrap;font-weight:700}
+.mname{flex:1;font-size:14px;font-weight:700;color:#1a1a18}
+.sbtns{display:flex;gap:6px}
+.sb{width:44px;height:44px;border-radius:10px;border:1.5px solid #ccc;background:#fff;cursor:pointer;font-size:17px;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;justify-content:center;transition:all 0.12s}
+.sb.gn{background:#e8f5ee;border-color:#2d6a4f;color:#2d6a4f}
+.sb.rd{background:#fdecea;border-color:#c0392b;color:#c0392b}
+.mbody{padding:10px 12px 12px}
+/* PRESCRIBED BLOCK */
+.pre-blk{background:#f0f7f4;border-radius:8px;padding:8px 10px;margin-bottom:10px;border-left:3px solid #2d6a4f}
+.pre-lbl{font-size:10px;font-weight:700;color:#2d6a4f;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.pre-txt{font-size:12px;color:#555;line-height:1.6}
+/* ACTUAL INPUT */
+.act-lbl{font-size:10px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.act-row{display:flex;gap:8px;align-items:center}
+.act-inp{flex:1;font-size:13px;padding:10px 10px;border:1.5px solid #d0d0d0;border-radius:10px;background:#fff;color:#1a1a18;-webkit-appearance:none;width:100%}
+.act-inp:focus{border-color:#2d6a4f;outline:none;background:#f8fdf9}
+.act-inp.filled{border-color:#2d6a4f;background:#f0faf4}
+.tpick{width:92px;font-size:12px;padding:10px 5px;border:1.5px solid #d0d0d0;border-radius:10px;background:#fff;color:#1a1a18;-webkit-appearance:none}
+.tpick:focus{border-color:#2d6a4f;outline:none}
+/* SUBTASK ROWS */
+.st-lbl{font-size:10px;font-weight:700;color:#2d6a4f;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px}
+.strow{display:flex;align-items:center;gap:10px;padding:10px;background:#f5f5f2;border-radius:8px;margin-bottom:6px;border:1.5px solid transparent;-webkit-tap-highlight-color:transparent;transition:all 0.12s}
+.strow.ck{background:#e8f5ee;border-color:#2d6a4f}
+.stcb{width:26px;height:26px;border-radius:7px;border:2px solid #bbb;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;cursor:pointer;transition:all 0.12s;min-width:26px}
+.strow.ck .stcb{background:#2d6a4f;border-color:#2d6a4f;color:#fff}
+.stn{font-size:13px;font-weight:600;color:#1a1a18}
+.strow.ck .stn{color:#1a4731}
+.sth{font-size:11px;color:#aaa;margin-top:1px}
+.strow.ck .sth{color:#40916c}
+/* INLINE SUBTASK (breakfast / lunch / dinner) */
+.ist{padding:10px;background:#f5f5f2;border-radius:8px;margin-bottom:6px;border:1.5px solid transparent}
+.ist.ck{background:#e8f5ee;border-color:#2d6a4f}
+.ist-top{display:flex;align-items:center;gap:10px}
+.ist-body{margin-top:7px}
+/* RESET */
+.resetrow{text-align:center;padding:8px 0 4px}
+.resetbtn{background:#fff;border:1px solid #ccc;border-radius:10px;padding:9px 20px;font-size:13px;color:#888;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.note{font-size:11px;color:#aaa;text-align:center;padding:10px 12px 16px;line-height:1.6}
+/* WELLNESS CARD */
+.wcard{background:#fff;border:1.5px solid #d8e8e0;border-radius:14px;margin-bottom:10px;overflow:hidden}
+.whead{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#f0faf4;border-bottom:1px solid #d4eddf}
+.wtitle{flex:1;font-size:14px;font-weight:700;color:#1a4731}
+.wbody{padding:12px}
+.wrow{margin-bottom:14px}
+.wlbl{font-size:10px;font-weight:700;color:#2d6a4f;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #ddd;background:#f5f5f2;color:#666;-webkit-tap-highlight-color:transparent;transition:all 0.12s}
+.chip.sg{background:#e8f5ee;border-color:#2d6a4f;color:#1a4731}
+.chip.sa{background:#fef3e2;border-color:#d97706;color:#92400e}
+.chip.sr{background:#fdecea;border-color:#c0392b;color:#7f1d1d}
+.wex{display:flex;flex-direction:column;gap:7px}
+.extogrow{display:flex;gap:8px}
+.extog{flex:1;padding:10px 0;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid #ddd;background:#f5f5f2;color:#666;text-align:center;-webkit-tap-highlight-color:transparent;transition:all 0.12s}
+.extog.on{background:#e8f5ee;border-color:#2d6a4f;color:#1a4731}
+.exinp{width:100%;font-size:13px;padding:10px;border:1.5px solid #d0d0d0;border-radius:10px;background:#fff;color:#1a1a18;-webkit-appearance:none}
+.exinp:focus{border-color:#2d6a4f;outline:none}
+.qchips{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.qchip{padding:6px 10px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:1.5px solid #ccc;background:#f5f5f2;color:#666;-webkit-tap-highlight-color:transparent}
+.qchip.on{background:#e8f5ee;border-color:#2d6a4f;color:#1a4731}
+/* WATER */
+.wwater{display:flex;align-items:center;gap:10px}
+.wbtn{width:38px;height:38px;border-radius:50%;border:1.5px solid #2d6a4f;background:#e8f5ee;color:#2d6a4f;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;flex-shrink:0}
+.wglasses{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.wg{width:28px;height:28px;border-radius:5px;border:1.5px solid #bbb;background:#f5f5f2;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:all 0.12s}
+.wg.on{background:#dbeafe;border-color:#3b6fd4}
+.wcnt{font-size:14px;font-weight:700;color:#1a4731;min-width:34px;text-align:right}
+/* WEEKLY */
+.wksec{padding:12px}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stcard{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #d8e8e0}
+.stlbl{font-size:11px;color:#888;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.stval{font-size:26px;font-weight:700;color:#1a1a18}
+.stsub{font-size:11px;color:#aaa;margin-top:2px}
+.wkhead{font-size:11px;font-weight:700;color:#888;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.daygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:10px}
+.dcell{border-radius:10px;padding:7px 2px;text-align:center;cursor:pointer;border:1.5px solid #d8e8e0;-webkit-tap-highlight-color:transparent;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color 0.12s}
+.dcell.sel{border:2px solid #2d6a4f}
+.dday{font-size:10px;font-weight:700;margin-bottom:2px}
+.dpct{font-size:12px;font-weight:700}
+.dcnt{font-size:9px;color:#aaa;margin-top:1px}
+.leg{display:flex;gap:10px;font-size:11px;color:#666;margin-bottom:14px;flex-wrap:wrap}
+.lsq{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:4px;vertical-align:middle}
+.hmaplabels{display:grid;grid-template-columns:80px 1fr;gap:6px;margin-bottom:3px}
+.hmapcols{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hmapcol{font-size:9px;color:#aaa;text-align:center;font-weight:600}
+.hmaprow{display:grid;grid-template-columns:80px 1fr;gap:6px;margin-bottom:4px;align-items:center}
+.hmaplbl{font-size:10px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.hmapcells{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.hmapcell{height:20px;border-radius:4px;border:1px solid #d8e8e0}
+.dhead{font-size:14px;font-weight:700;color:#1a1a18;margin:16px 0 8px;padding-top:14px;border-top:1px solid #e0dfd8}
+.drow{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f0efeb}
+.dic{font-size:16px;width:20px;text-align:center;flex-shrink:0;margin-top:1px}
+.dmain{flex:1;min-width:0}
+.dname{font-size:13px;font-weight:700;color:#1a1a18}
+.dpre{font-size:11px;color:#aaa;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.date2{font-size:11px;color:#2d6a4f;margin-top:3px;font-weight:600}
+.dtime{font-size:11px;color:#aaa;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.wsnap{background:#f0faf4;border-radius:12px;padding:12px;margin-top:14px;border:1px solid #d4eddf}
+.wsnaplbl{font-size:11px;font-weight:700;color:#2d6a4f;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.wsnapgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wsnapi{font-size:10px;color:#888;margin-bottom:3px}
+.optbadge{font-size:9px;background:#fef3e2;color:#854F0B;border-radius:4px;padding:1px 5px;margin-left:5px;font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-sub">Saloni's Wellness Journey</div>
+  <div class="hdr-title">Nourish. Heal. Thrive.</div>
+  <div class="hdr-quote">Every mindful meal is an act of self-love.<br>You are doing something beautiful for yourself — one day at a time.</div>
+  <div class="hdr-week">11 – 17 Sep 2026 &nbsp;·&nbsp; Week 1</div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn on" id="tbtn-d" onclick="switchTab('d')">Daily checklist</button>
+  <button class="tab-btn" id="tbtn-w" onclick="switchTab('w')">Weekly map</button>
+</div>
+
+<div class="panel on" id="panel-d"></div>
+<div class="panel" id="panel-w"></div>
+
+<script>
+var DAYS=[
+  {label:"Day 1 · Friday",   date:"11 Sep 2026"},
+  {label:"Day 2 · Saturday", date:"12 Sep 2026"},
+  {label:"Day 3 · Sunday",   date:"13 Sep 2026"},
+  {label:"Day 4 · Monday",   date:"14 Sep 2026"},
+  {label:"Day 5 · Tuesday",  date:"15 Sep 2026"},
+  {label:"Day 6 · Wednesday",date:"16 Sep 2026"},
+  {label:"Day 7 · Thursday", date:"17 Sep 2026"}
+];
+var SHORT=["Fri","Sat","Sun","Mon","Tue","Wed","Thu"];
+var BF=["Scrambled paneer with sauté veggies","Poha vada (steamed) with curry leaves chutney","Moong dal veggies roll","Spinach egg scramble","Overnight savoury oats","Avocado sandwich (sourdough)","Veg quinoa"];
+var LU=["Barley bowl","Steamed rice with Thai curry","Veg pulao with avocado coconut curry","Steamed rice with sambhar","Oats burrito bowl","Veg lentil idli with moringa dal","Millet chickpeas pulao"];
+var DN=["Ragi/jaun roti with seasonal sabji","Pleasure meal","Mexican salad","Jawar khichri","Veg wrap","Veg oats daliya","Barnyard millet (samak) rice"];
+var MEALS=[
+  {time:"8:00 AM", name:"Morning routine", short:"Morning"},
+  {time:"8:30 AM", name:"Pre-breakfast",   short:"Pre-BF"},
+  {time:"9:00 AM", name:"Breakfast",       short:"Breakfast"},
+  {time:"11:00 AM",name:"Mid-morning drink",short:"Mid-AM"},
+  {time:"12:30 PM",name:"Pre-lunch salad", short:"Pre-LU"},
+  {time:"1:30 PM", name:"Lunch",           short:"Lunch"},
+  {time:"4:00 PM", name:"Evening tea",     short:"Eve tea"},
+  {time:"6:30 PM", name:"Pre-dinner",      short:"Pre-DN"},
+  {time:"7:30 PM", name:"Dinner",          short:"Dinner"}
+];
+var NM=MEALS.length;
+
+var MORNING_ST=[
+  {name:"Pay gratitude",     hint:"Connect with nature, set intention"},
+  {name:"Oil pulling",       hint:"10–15 min, spit and rinse after"},
+  {name:"Jeera saunf water", hint:"Drink after oil pulling"},
+  {name:"Deep breathing",    hint:"5–10 min belly breath"},
+  {name:"Stretching",        hint:"5–10 min gentle stretches"}
+];
+var DINNER_ST=[
+  {name:"Warm water before",    hint:"1 glass lukewarm — 30 min before dinner",   opt:false, inp:false},
+  {name:"Dinner item",          hint:"",                                           opt:false, inp:true},
+  {name:"Warm water after",     hint:"1 glass lukewarm — 20–30 min after dinner", opt:false, inp:false},
+  {name:"Chamomile tulsi tea",  hint:"Optional — 1 hr before bed",                opt:true,  inp:false},
+  {name:"Belly breath exercise",hint:"Refer to recipe section",                   opt:false, inp:false},
+  {name:"Pay gratitude",        hint:"Be thankful for the day",                   opt:false, inp:false}
+];
+var QEXERCISE=["30 min walk","2 rounds walk","45 min walk","Yoga","Gym","Stretching","Dance","Cycling","Swimming","Home workout"];
+
+var cur=0, selD=0;
+
+function lsGet(){try{var s=localStorage.getItem("dtrk26");return s?JSON.parse(s):{}}catch(e){return {}}}
+function lsSave(){try{localStorage.setItem("dtrk26",JSON.stringify(ST))}catch(e){}}
+var ST=lsGet();
+
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function mk(d,m){return "m"+d+"_"+m}
+function gs(d,m){return ST[mk(d,m)]||{st:"",ate:"",tm:""}}
+function us(d,m,p){ST[mk(d,m)]=Object.assign({},gs(d,m),p);lsSave();render()}
+
+function mstk(d,i){return "ms"+d+"_"+i}
+function gmst(d,i){return ST[mstk(d,i)]||false}
+function smst(d,i,v){
+  ST[mstk(d,i)]=v;
+  var all=true;for(var x=0;x<MORNING_ST.length;x++)if(!ST[mstk(d,x)])all=false;
+  ST[mk(d,0)]=Object.assign({},gs(d,0),{st:all?"done":""});
+  lsSave();render();
+}
+
+function bfk(d,i){return "bf"+d+"_"+i}
+function gbf(d,i){return ST[bfk(d,i)]||{st:"",ate:""}}
+function ubf(d,i,p){
+  ST[bfk(d,i)]=Object.assign({},gbf(d,i),p);
+  var all=gbf(d,0).st==="done"&&gbf(d,1).st==="done";
+  ST[mk(d,2)]=Object.assign({},gs(d,2),{st:all?"done":""});
+  lsSave();render();
+}
+
+function luk(d,i){return "lu"+d+"_"+i}
+function glu(d,i){return ST[luk(d,i)]||{st:"",ate:""}}
+function ulu(d,i,p){
+  ST[luk(d,i)]=Object.assign({},glu(d,i),p);
+  var all=glu(d,0).st==="done"&&glu(d,1).st==="done";
+  ST[mk(d,5)]=Object.assign({},gs(d,5),{st:all?"done":""});
+  lsSave();render();
+}
+
+function dnk(d,i){return "dn"+d+"_"+i}
+function gdn(d,i){return ST[dnk(d,i)]||{st:"",ate:""}}
+function udn(d,i,p){
+  ST[dnk(d,i)]=Object.assign({},gdn(d,i),p);
+  var man=true;
+  for(var x=0;x<DINNER_ST.length;x++)if(!DINNER_ST[x].opt&&gdn(d,x).st!=="done")man=false;
+  ST[mk(d,8)]=Object.assign({},gs(d,8),{st:man?"done":""});
+  lsSave();render();
+}
+
+function wlk(d){return "wl"+d}
+function gwl(d){return ST[wlk(d)]||{energy:"",digestion:"",stress:"",water:0,exercise:"",exnote:""}}
+function uwl(d,p){ST[wlk(d)]=Object.assign({},gwl(d),p);lsSave();render()}
+
+function doneCnt(d){var n=0;for(var i=0;i<NM;i++)if(gs(d,i).st==="done")n++;return n}
+function skipCnt(d){var n=0;for(var i=0;i<NM;i++)if(gs(d,i).st==="skip")n++;return n}
+function pct(d){return Math.round(doneCnt(d)/NM*100)}
+
+function cellBg(p){
+  if(p===0)return"#f0f7f4";
+  if(p<34)return"#D3F5E4";
+  if(p<67)return"#9FE1CB";
+  if(p<100)return"#5DCAA5";
+  return"#1D9E75";
+}
+function cellTc(p){return p<34?"#085041":"#04342C"}
+function hmapBg(st){return st==="done"?"#2d6a4f":st==="skip"?"#c0392b":"#e8ede9"}
+
+function prescribed(mi,d){
+  if(mi===0)return"Morning routine subtasks";
+  if(mi===1)return"1 seasonal fruit · 5 soaked almonds · ½ walnut · Seeds mix (pumpkin, watermelon, sunflower 1 tsp each) · 1 soaked fig + 1 prune";
+  if(mi===2)return"Breakfast subtasks";
+  if(mi===3)return"Choose 1: Ginger peppermint water / Chia+sabja+gondkatira / Fresh veg juice / Coconut water / Buttermilk (jeera+coriander)";
+  if(mi===4)return"Salad sticks OR sauté veggies salad with shredded coconut";
+  if(mi===5)return"Lunch subtasks";
+  if(mi===6)return"Peppermint / lemongrass / jasmine / herbal tea · With: makhane / puffed rice / coconut slices / black channa";
+  if(mi===7)return"Sauté veggies salad OR soup";
+  if(mi===8)return"Dinner subtasks";
+}
+
+/* ---- CARD BUILDERS ---- */
+function morningCard(){
+  var dc=0; for(var i=0;i<MORNING_ST.length;i++)if(gmst(cur,i))dc++;
+  var all=dc===MORNING_ST.length;
+  var rows=MORNING_ST.map(function(st,i){
+    var c=gmst(cur,i);
+    return '<div class="strow'+(c?" ck":"")+'" onclick="smst('+cur+','+i+','+(c?'false':'true')+')">'+
+      '<div class="stcb">'+(c?"✓":"")+'</div>'+
+      '<div><div class="stn">'+st.name+'</div><div class="sth">'+st.hint+'</div></div>'+
+    '</div>';
+  }).join("");
+  return '<div class="mcard'+(all?" done-card":"")+'">'+
+    '<div class="mhead"><span class="tbadge">8:00 AM</span><span class="mname">Morning routine</span>'+
+    '<span style="font-size:12px;font-weight:700;color:'+(all?"#2d6a4f":"#aaa")+'">'+dc+'/'+MORNING_ST.length+'</span></div>'+
+    '<div class="mbody"><div class="st-lbl">Tap each to check off</div>'+rows+'</div></div>';
+}
+
+function breakfastCard(){
+  var b0=gbf(cur,0),b1=gbf(cur,1);
+  var dc=(b0.st==="done"?1:0)+(b1.st==="done"?1:0);
+  var all=dc===2;
+  function brow(i,name,hint,showInp,s){
+    var done=s.st==="done";
+    return '<div class="ist'+(done?" ck":"")+'">'+
+      '<div class="ist-top">'+
+        '<div class="stcb" onclick="ubf('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
+        '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+      '</div>'+
+      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="ubf('+cur+','+i+',{ate:this.value})"></div>':"")+
+    '</div>';
+  }
+  return '<div class="mcard'+(all?" done-card":"")+'">'+
+    '<div class="mhead"><span class="tbadge">9:00 AM</span><span class="mname">Breakfast</span>'+
+    '<span style="font-size:12px;font-weight:700;color:'+(all?"#2d6a4f":"#aaa")+'">'+dc+'/2</span></div>'+
+    '<div class="mbody"><div class="st-lbl">Tap checkbox to mark each done</div>'+
+    brow(0,"Diabetic powder","1 tsp in warm water — 30 min before meal",false,b0)+
+    brow(1,"Breakfast item",BF[cur],true,b1)+
+    '</div></div>';
+}
+
+function lunchCard(){
+  var l0=glu(cur,0),l1=glu(cur,1);
+  var dc=(l0.st==="done"?1:0)+(l1.st==="done"?1:0);
+  var all=dc===2;
+  function lrow(i,name,hint,showInp,s){
+    var done=s.st==="done";
+    return '<div class="ist'+(done?" ck":"")+'">'+
+      '<div class="ist-top">'+
+        '<div class="stcb" onclick="ulu('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
+        '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+      '</div>'+
+      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="ulu('+cur+','+i+',{ate:this.value})"></div>':"")+
+    '</div>';
+  }
+  return '<div class="mcard'+(all?" done-card":"")+'">'+
+    '<div class="mhead"><span class="tbadge">1:30 PM</span><span class="mname">Lunch</span>'+
+    '<span style="font-size:12px;font-weight:700;color:'+(all?"#2d6a4f":"#aaa")+'">'+dc+'/2</span></div>'+
+    '<div class="mbody"><div class="st-lbl">Tap checkbox to mark each done</div>'+
+    lrow(0,"Lunch item",LU[cur]+" · Add 1 tsp flaxseed powder",true,l0)+
+    lrow(1,"After 20 min","Ajwain with water / lukewarm lemon water / elaichi + clove",false,l1)+
+    '</div></div>';
+}
+
+function dinnerCard(){
+  var dc=0;
+  for(var i=0;i<DINNER_ST.length;i++)if(gdn(cur,i).st==="done")dc++;
+  var man=true;
+  for(var i=0;i<DINNER_ST.length;i++)if(!DINNER_ST[i].opt&&gdn(cur,i).st!=="done")man=false;
+  var rows=DINNER_ST.map(function(st,i){
+    var s=gdn(cur,i);
+    var done=s.st==="done";
+    var hint=i===1?DN[cur]:st.hint;
+    return '<div class="ist'+(done?" ck":"")+'">'+
+      '<div class="ist-top">'+
+        '<div class="stcb" onclick="udn('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
+        '<div style="flex:1"><div class="stn">'+st.name+(st.opt?'<span class="optbadge">optional</span>':"")+
+        '</div><div class="sth">'+hint+'</div></div>'+
+      '</div>'+
+      (st.inp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="udn('+cur+','+i+',{ate:this.value})"></div>':"")+
+    '</div>';
+  }).join("");
+  return '<div class="mcard'+(man?" done-card":"")+'">'+
+    '<div class="mhead"><span class="tbadge">7:30 PM</span><span class="mname">Dinner</span>'+
+    '<span style="font-size:12px;font-weight:700;color:'+(man?"#2d6a4f":"#aaa")+'">'+dc+'/'+DINNER_ST.length+'</span></div>'+
+    '<div class="mbody"><div class="st-lbl">Tap each task to check off</div>'+rows+'</div></div>';
+}
+
+function regularCard(m,i){
+  var s=gs(cur,i);
+  var done=s.st==="done",skip=s.st==="skip";
+  var ph=skip?"What you had instead…":"What you actually had…";
+  return '<div class="mcard'+(done?" done-card":skip?" skip-card":"")+'">'+
+    '<div class="mhead">'+
+      '<span class="tbadge">'+m.time+'</span>'+
+      '<span class="mname">'+m.name+'</span>'+
+      '<div class="sbtns">'+
+        '<button class="sb'+(done?" gn":"")+'" onclick="us('+cur+','+i+',{st:\''+(done?"":"done")+'\'})" aria-label="done">✓</button>'+
+        '<button class="sb'+(skip?" rd":"")+'" onclick="us('+cur+','+i+',{st:\''+(skip?"":"skip")+'\'})" aria-label="skip">✗</button>'+
+      '</div>'+
+    '</div>'+
+    '<div class="mbody">'+
+      '<div class="pre-blk"><div class="pre-lbl">Prescribed</div><div class="pre-txt">'+prescribed(i,cur)+'</div></div>'+
+      '<div class="act-lbl">Had</div>'+
+      '<div class="act-row">'+
+        '<input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="'+esc(ph)+'" value="'+esc(s.ate)+'" oninput="us('+cur+','+i+',{ate:this.value})">'+
+        '<input class="tpick" type="time" value="'+esc(s.tm)+'" onchange="us('+cur+','+i+',{tm:this.value})">'+
+      '</div>'+
+    '</div></div>';
+}
+
+function wellnessCard(){
+  var w=gwl(cur);
+  function chipRow(lbl,field,opts){
+    var chips=opts.map(function(o){
+      var sel=w[field]===o.v;
+      return '<div class="chip'+(sel?" s"+o.c:"")+'" onclick="uwl('+cur+',{'+field+':\''+(sel?"":o.v)+'\'})">'+o.l+'</div>';
+    }).join("");
+    return '<div class="wrow"><div class="wlbl">'+lbl+'</div><div class="chips">'+chips+'</div></div>';
+  }
+  var glasses="";
+  for(var i=1;i<=8;i++){
+    var on=i<=w.water;
+    glasses+='<div class="wg'+(on?" on":"")+'" onclick="uwl('+cur+',{water:'+(i===w.water?i-1:i)+'})">'+(on?"💧":"")+'</div>';
+  }
+  var exOn=w.exercise==="yes";
+  var exNote=exOn?
+    '<input class="exinp" type="text" placeholder="e.g. 30 min walk · 2 rounds park · yoga · gym…" value="'+esc(w.exnote)+'" oninput="uwl('+cur+',{exnote:this.value})" style="margin-bottom:8px">'+
+    '<div class="qchips">'+QEXERCISE.map(function(t){var s=w.exnote===t;return '<div class="qchip'+(s?" on":"")+'" onclick="uwl('+cur+',{exnote:\''+(s?"":t)+'\'})">'+t+'</div>';}).join("")+'</div>'
+    :"";
+  return '<div class="wcard">'+
+    '<div class="whead"><span style="font-size:17px">📋</span><span class="wtitle">Daily wellness log</span></div>'+
+    '<div class="wbody">'+
+      '<div class="wrow"><div class="wlbl">Movement / exercise</div>'+
+        '<div class="wex">'+
+          '<div class="extogrow">'+
+            '<div class="extog'+(exOn?" on":"")+'" onclick="uwl('+cur+',{exercise:\''+(exOn?"":"yes")+'\'})">Yes, I moved</div>'+
+            '<div class="extog'+(w.exercise==="no"?" on":"")+'" onclick="uwl('+cur+',{exercise:\''+(w.exercise==="no"?"":"no")+'\'})">Not today</div>'+
+          '</div>'+exNote+
+        '</div>'+
+      '</div>'+
+      '<div class="wrow"><div class="wlbl">Water intake <span style="font-size:11px;color:#aaa;font-weight:400;text-transform:none">(target 8 glasses)</span></div>'+
+        '<div class="wwater">'+
+          '<div class="wbtn" onclick="uwl('+cur+',{water:Math.max(0,gwl('+cur+').water-1)})">−</div>'+
+          '<div class="wglasses">'+glasses+'</div>'+
+          '<div class="wcnt">'+w.water+'/8</div>'+
+        '</div>'+
+      '</div>'+
+      chipRow("Energy level","energy",[{v:"good",l:"Good",c:"g"},{v:"okay",l:"Okay",c:"a"},{v:"low",l:"Low",c:"r"}])+
+      chipRow("Digestion","digestion",[{v:"good",l:"Good",c:"g"},{v:"okay",l:"Okay",c:"a"},{v:"bad",l:"Poor",c:"r"}])+
+      chipRow("Stress level","stress",[{v:"none",l:"None",c:"g"},{v:"low",l:"Low",c:"g"},{v:"medium",l:"Medium",c:"a"},{v:"high",l:"High",c:"r"}])+
+    '</div></div>';
+}
+
+/* ---- DRAW DAILY ---- */
+function drawDaily(){
+  var done=doneCnt(cur);
+  var p=Math.round(done/NM*100);
+  var cards="";
+  for(var i=0;i<NM;i++){
+    if(i===0)cards+=morningCard();
+    else if(i===2)cards+=breakfastCard();
+    else if(i===5)cards+=lunchCard();
+    else if(i===8)cards+=dinnerCard();
+    else cards+=regularCard(MEALS[i],i);
+  }
+  var html='<div class="panel on" id="panel-d">'+
+    '<div style="padding:12px">'+
+    '<div class="topbar">'+
+      '<button class="nbtn" onclick="if(cur>0){cur--;render()}">&#8249;</button>'+
+      '<div><div class="daytitle">'+DAYS[cur].label+'</div><div class="datesub">'+DAYS[cur].date+'</div></div>'+
+      '<button class="nbtn" onclick="if(cur<6){cur++;render()}">&#8250;</button>'+
+    '</div>'+
+    '<div class="progrow"><div class="progtrack"><div class="progfill" style="width:'+p+'%"></div></div>'+
+    '<span class="proglbl">'+done+'/'+NM+' done</span></div>'+
+    cards+
+    wellnessCard()+
+    '<div class="resetrow"><button class="resetbtn" onclick="resetDay()">↺ Reset this day</button></div>'+
+    '<p class="note">Entries saved automatically on this device.</p>'+
+    '</div></div>';
+  document.getElementById("panel-d").outerHTML=html;
+  document.getElementById("tbtn-d").onclick=function(){switchTab("d")};
+  document.getElementById("tbtn-w").onclick=function(){switchTab("w")};
+}
+
+/* ---- DRAW WEEKLY ---- */
+function drawWeekly(){
+  var totalDone=0,totalSkip=0;
+  for(var d=0;d<7;d++){totalDone+=doneCnt(d);totalSkip+=skipCnt(d);}
+  var bestD=0,bestP=0;
+  for(var d=0;d<7;d++){var p=pct(d);if(p>=bestP){bestP=p;bestD=d;}}
+
+  var dayCells=SHORT.map(function(s,i){
+    var p=pct(i);var bg=cellBg(p);var tc=p===0?"#aaa":cellTc(p);
+    return '<div class="dcell'+(i===selD?" sel":"")+'" style="background:'+bg+'" onclick="selD='+i+';drawWeekly()">'+
+      '<div class="dday" style="color:'+tc+'">'+s+'</div>'+
+      '<div class="dpct" style="color:'+tc+'">'+(p===0?"—":p+"%")+'</div>'+
+      '<div class="dcnt">'+doneCnt(i)+"/"+NM+'</div></div>';
+  }).join("");
+
+  var hmapHtml='<div class="hmaplabels"><div></div><div class="hmapcols">'+
+    SHORT.map(function(s){return'<div class="hmapcol">'+s+'</div>';}).join("")+'</div></div>';
+  for(var mi=0;mi<NM;mi++){
+    var cells="";
+    for(var di=0;di<7;di++)cells+='<div class="hmapcell" style="background:'+hmapBg(gs(di,mi).st)+'"></div>';
+    hmapHtml+='<div class="hmaprow"><div class="hmaplbl">'+MEALS[mi].short+'</div><div class="hmapcells">'+cells+'</div></div>';
+  }
+
+  var detailRows="";
+  for(var mi=0;mi<NM;mi++){
+    var s=gs(selD,mi);
+    var ic=s.st==="done"?"✓":s.st==="skip"?"✗":"·";
+    var icol=s.st==="done"?"#2d6a4f":s.st==="skip"?"#c0392b":"#aaa";
+    var pre=prescribed(mi,selD);if(pre.length>55)pre=pre.slice(0,52)+"…";
+    detailRows+='<div class="drow"><div class="dic" style="color:'+icol+'">'+ic+'</div>'+
+      '<div class="dmain"><div class="dname">'+MEALS[mi].name+'</div>'+
+      '<div class="dpre">'+esc(pre)+'</div>'+
+      (s.ate?'<div class="date2">Had: '+esc(s.ate)+'</div>':"")+
+      '</div>'+(s.tm?'<div class="dtime">'+esc(s.tm)+'</div>':"")+
+    '</div>';
+  }
+
+  var wl=gwl(selD);
+  function wb(v,g,a){
+    if(!v)return'<span style="font-size:11px;color:#bbb">—</span>';
+    var bg=v===g?"#e8f5ee":v===a?"#fef3e2":"#fdecea";
+    var c=v===g?"#1a4731":v===a?"#92400e":"#7f1d1d";
+    return'<span style="background:'+bg+';color:'+c+';border-radius:10px;padding:2px 9px;font-size:11px;font-weight:600">'+v.charAt(0).toUpperCase()+v.slice(1)+'</span>';
+  }
+  var wlSnap='<div class="wsnap"><div class="wsnaplbl">Wellness snapshot</div>'+
+    '<div class="wsnapgrid">'+
+    '<div><div class="wsnapi">Energy</div>'+wb(wl.energy,"good","okay")+'</div>'+
+    '<div><div class="wsnapi">Digestion</div>'+wb(wl.digestion,"good","okay")+'</div>'+
+    '<div><div class="wsnapi">Stress</div>'+wb(wl.stress,"none","medium")+'</div>'+
+    '<div><div class="wsnapi">Water</div><span style="font-size:13px;font-weight:700;color:#1a4731">'+wl.water+'/8</span><span style="font-size:10px;color:#aaa"> glasses</span></div>'+
+    '</div>'+
+    (wl.exercise?'<div style="margin-top:8px;padding-top:8px;border-top:1px solid #d4eddf"><span style="font-size:10px;color:#888">Movement: </span><span style="font-size:12px;font-weight:600;color:#1a4731">'+(wl.exercise==="yes"?(wl.exnote||"Yes"):"Not today")+'</span></div>':"")+
+    '</div>';
+
+  var html='<div class="panel on" id="panel-w">'+
+    '<div class="wksec">'+
+    '<div class="statgrid">'+
+      '<div class="stcard"><div class="stlbl">Week compliance</div><div class="stval">'+Math.round(totalDone/(7*NM)*100)+'%</div><div class="stsub">'+totalDone+' of '+(7*NM)+' meals</div></div>'+
+      '<div class="stcard"><div class="stlbl">Best day</div><div class="stval">'+SHORT[bestD]+'</div><div class="stsub">'+bestP+'% done</div></div>'+
+      '<div class="stcard"><div class="stlbl">Total done</div><div class="stval">'+totalDone+'</div><div class="stsub">meals</div></div>'+
+      '<div class="stcard"><div class="stlbl">Skipped</div><div class="stval">'+totalSkip+'</div><div class="stsub">meals</div></div>'+
+    '</div>'+
+    '<div class="wkhead">Daily overview — tap a day</div>'+
+    '<div class="daygrid">'+dayCells+'</div>'+
+    '<div class="leg">'+
+      '<span><span class="lsq" style="background:#D3F5E4;border:1px solid #9FE1CB"></span>1–33%</span>'+
+      '<span><span class="lsq" style="background:#9FE1CB"></span>34–66%</span>'+
+      '<span><span class="lsq" style="background:#5DCAA5"></span>67–99%</span>'+
+      '<span><span class="lsq" style="background:#1D9E75"></span>100%</span>'+
+    '</div>'+
+    '<div class="wkhead">Meal heatmap</div>'+
+    hmapHtml+
+    '<div style="display:flex;gap:12px;font-size:11px;color:#666;margin:8px 0 16px;flex-wrap:wrap">'+
+      '<span><span class="lsq" style="background:#2d6a4f"></span>Done</span>'+
+      '<span><span class="lsq" style="background:#c0392b"></span>Skipped</span>'+
+      '<span><span class="lsq" style="background:#e8ede9;border:1px solid #ccc"></span>Pending</span>'+
+    '</div>'+
+    '<div class="dhead">'+DAYS[selD].label+' — detail</div>'+
+    detailRows+wlSnap+
+    '</div></div>';
+  document.getElementById("panel-w").outerHTML=html;
+  document.getElementById("tbtn-d").onclick=function(){switchTab("d")};
+  document.getElementById("tbtn-w").onclick=function(){switchTab("w")};
+}
+
+function switchTab(t){
+  document.getElementById("tbtn-d").className="tab-btn"+(t==="d"?" on":"");
+  document.getElementById("tbtn-w").className="tab-btn"+(t==="w"?" on":"");
+  if(t==="d"){
+    document.getElementById("panel-d").style.display="block";
+    document.getElementById("panel-w").style.display="none";
+  } else {
+    document.getElementById("panel-d").style.display="none";
+    document.getElementById("panel-w").style.display="block";
+    drawWeekly();
+  }
+}
+
+function render(){
+  var wd=document.getElementById("panel-w");
+  drawDaily();
+  if(wd&&wd.style.display!=="none")drawWeekly();
+}
+
+function resetDay(){
+  if(!confirm("Reset all entries for "+DAYS[cur].label+"?"))return;
+  for(var i=0;i<NM;i++)ST[mk(cur,i)]={st:"",ate:"",tm:""};
+  for(var i=0;i<MORNING_ST.length;i++)ST[mstk(cur,i)]=false;
+  for(var i=0;i<2;i++)ST[bfk(cur,i)]={st:"",ate:""};
+  for(var i=0;i<2;i++)ST[luk(cur,i)]={st:"",ate:""};
+  for(var i=0;i<DINNER_ST.length;i++)ST[dnk(cur,i)]={st:"",ate:""};
+  ST[wlk(cur)]={energy:"",digestion:"",stress:"",water:0,exercise:"",exnote:""};
+  lsSave();render();
+}
+
+/* Boot */
+drawDaily();
+</script>
+</body>
+</html>
