@@ -308,7 +308,7 @@ function breakfastCard(){
         '<div class="stcb" onclick="ubf('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
         '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
       '</div>'+
-      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="ubf('+cur+','+i+',{ate:this.value})"></div>':"")+
+      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="ubf('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
   }
   return '<div class="mcard'+(all?" done-card":"")+'">'+
@@ -331,7 +331,7 @@ function lunchCard(){
         '<div class="stcb" onclick="ulu('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
         '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
       '</div>'+
-      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="ulu('+cur+','+i+',{ate:this.value})"></div>':"")+
+      (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="ulu('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
   }
   return '<div class="mcard'+(all?" done-card":"")+'">'+
@@ -358,7 +358,7 @@ function dinnerCard(){
         '<div style="flex:1"><div class="stn">'+st.name+(st.opt?'<span class="optbadge">optional</span>':"")+
         '</div><div class="sth">'+hint+'</div></div>'+
       '</div>'+
-      (st.inp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" oninput="udn('+cur+','+i+',{ate:this.value})"></div>':"")+
+      (st.inp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="udn('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
   }).join("");
   return '<div class="mcard'+(man?" done-card":"")+'">'+
@@ -384,7 +384,7 @@ function regularCard(m,i){
       '<div class="pre-blk"><div class="pre-lbl">Prescribed</div><div class="pre-txt">'+prescribed(i,cur)+'</div></div>'+
       '<div class="act-lbl">Had</div>'+
       '<div class="act-row">'+
-        '<input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="'+esc(ph)+'" value="'+esc(s.ate)+'" oninput="us('+cur+','+i+',{ate:this.value})">'+
+        '<input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="'+esc(ph)+'" value="'+esc(s.ate)+'" onblur="us('+cur+','+i+',{ate:this.value})">'+
         '<input class="tpick" type="time" value="'+esc(s.tm)+'" onchange="us('+cur+','+i+',{tm:this.value})">'+
       '</div>'+
     '</div></div>';
@@ -406,7 +406,7 @@ function wellnessCard(){
   }
   var exOn=w.exercise==="yes";
   var exNote=exOn?
-    '<input class="exinp" type="text" placeholder="e.g. 30 min walk · 2 rounds park · yoga · gym…" value="'+esc(w.exnote)+'" oninput="uwl('+cur+',{exnote:this.value})" style="margin-bottom:8px">'+
+    '<input class="exinp" type="text" placeholder="e.g. 30 min walk · 2 rounds park · yoga · gym…" value="'+esc(w.exnote)+'" onblur="uwl('+cur+',{exnote:this.value})" style="margin-bottom:8px">'+
     '<div class="qchips">'+QEXERCISE.map(function(t){var s=w.exnote===t;return '<div class="qchip'+(s?" on":"")+'" onclick="uwl('+cur+',{exnote:\''+(s?"":t)+'\'})">'+t+'</div>';}).join("")+'</div>'
     :"";
   return '<div class="wcard">'+
