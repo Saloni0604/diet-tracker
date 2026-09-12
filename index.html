@@ -214,10 +214,10 @@ function gs(d,m){return ST[mk(d,m)]||{st:"",ate:"",tm:""}}
 function us(d,m,p){ST[mk(d,m)]=Object.assign({},gs(d,m),p);lsSave();render()}
 
 function mstk(d,i){return "ms"+d+"_"+i}
-function gmst(d,i){return ST[mstk(d,i)]||false}
-function smst(d,i,v){
-  ST[mstk(d,i)]=v;
-  var all=true;for(var x=0;x<MORNING_ST.length;x++)if(!ST[mstk(d,x)])all=false;
+function gmst(d,i){return ST[mstk(d,i)]||{ck:false,tm:""}}
+function smst(d,i,p){
+  ST[mstk(d,i)]=Object.assign({},gmst(d,i),p);
+  var all=true;for(var x=0;x<MORNING_ST.length;x++)if(!ST[mstk(d,x)].ck)all=false;
   ST[mk(d,0)]=Object.assign({},gs(d,0),{st:all?"done":""});
   lsSave();render();
 }
@@ -282,13 +282,14 @@ function prescribed(mi,d){
 
 /* ---- CARD BUILDERS ---- */
 function morningCard(){
-  var dc=0; for(var i=0;i<MORNING_ST.length;i++)if(gmst(cur,i))dc++;
+  var dc=0; for(var i=0;i<MORNING_ST.length;i++)if(gmst(cur,i).ck)dc++;
   var all=dc===MORNING_ST.length;
   var rows=MORNING_ST.map(function(st,i){
-    var c=gmst(cur,i);
-    return '<div class="strow'+(c?" ck":"")+'" onclick="smst('+cur+','+i+','+(c?'false':'true')+')">'+
-      '<div class="stcb">'+(c?"✓":"")+'</div>'+
-      '<div><div class="stn">'+st.name+'</div><div class="sth">'+st.hint+'</div></div>'+
+    var s=gmst(cur,i); var c=s.ck;
+    return '<div class="strow'+(c?" ck":"")+'">'+
+      '<div class="stcb" onclick="smst('+cur+','+i+',{ck:'+(c?'false':'true')+'})">'+(c?"✓":"")+'</div>'+
+      '<div style="flex:1"><div class="stn">'+st.name+'</div><div class="sth">'+st.hint+'</div></div>'+
+      '<input class="tpick" type="time" value="'+esc(s.tm)+'" onchange="smst('+cur+','+i+',{tm:this.value})">'+
     '</div>';
   }).join("");
   return '<div class="mcard'+(all?" done-card":"")+'">'+
@@ -306,7 +307,8 @@ function breakfastCard(){
     return '<div class="ist'+(done?" ck":"")+'">'+
       '<div class="ist-top">'+
         '<div class="stcb" onclick="ubf('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
-        '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+        '<div style="flex:1"><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+        '<input class="tpick" type="time" value="'+esc(s.tm||"")+'" onchange="ubf('+cur+','+i+',{tm:this.value})">'+
       '</div>'+
       (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="ubf('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
@@ -329,7 +331,8 @@ function lunchCard(){
     return '<div class="ist'+(done?" ck":"")+'">'+
       '<div class="ist-top">'+
         '<div class="stcb" onclick="ulu('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
-        '<div><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+        '<div style="flex:1"><div class="stn">'+name+'</div><div class="sth">'+hint+'</div></div>'+
+        '<input class="tpick" type="time" value="'+esc(s.tm||"")+'" onchange="ulu('+cur+','+i+',{tm:this.value})">'+
       '</div>'+
       (showInp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="ulu('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
@@ -357,6 +360,7 @@ function dinnerCard(){
         '<div class="stcb" onclick="udn('+cur+','+i+',{st:\''+(done?"":"done")+'\'})">'+(done?"✓":"")+'</div>'+
         '<div style="flex:1"><div class="stn">'+st.name+(st.opt?'<span class="optbadge">optional</span>':"")+
         '</div><div class="sth">'+hint+'</div></div>'+
+        '<input class="tpick" type="time" value="'+esc(s.tm||"")+'" onchange="udn('+cur+','+i+',{tm:this.value})">'+
       '</div>'+
       (st.inp?'<div class="ist-body"><input class="act-inp'+(s.ate?" filled":"")+'" type="text" placeholder="What you actually had…" value="'+esc(s.ate)+'" onblur="udn('+cur+','+i+',{ate:this.value})"></div>':"")+
     '</div>';
@@ -571,7 +575,7 @@ function render(){
 function resetDay(){
   if(!confirm("Reset all entries for "+DAYS[cur].label+"?"))return;
   for(var i=0;i<NM;i++)ST[mk(cur,i)]={st:"",ate:"",tm:""};
-  for(var i=0;i<MORNING_ST.length;i++)ST[mstk(cur,i)]=false;
+  for(var i=0;i<MORNING_ST.length;i++)ST[mstk(cur,i)]={ck:false,tm:""};
   for(var i=0;i<2;i++)ST[bfk(cur,i)]={st:"",ate:""};
   for(var i=0;i<2;i++)ST[luk(cur,i)]={st:"",ate:""};
   for(var i=0;i<DINNER_ST.length;i++)ST[dnk(cur,i)]={st:"",ate:""};
